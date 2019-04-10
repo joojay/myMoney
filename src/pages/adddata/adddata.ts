@@ -16,9 +16,10 @@ import { Toast } from '@ionic-native/toast';
   templateUrl: 'adddata.html',
 })
 export class AdddataPage {
-  data = {date: "", type: "", description: "", amount:0 };
+  data = { date: "", type:"", description:"", amount:0 };
+  status="";
   constructor(public navCtrl: NavController, public navParams: NavParams, 
-    public sqlite: SQLite, public toast: Toast ) {
+    public sqlite: SQLite, public toast: Toast) {
   }
 
   ionViewDidLoad() {
@@ -26,43 +27,46 @@ export class AdddataPage {
   }
 
   saveData(){
+    console.log(this.data);
     this.sqlite.create({
       name: 'ionicdb.db',
       location: 'default'
     })
       .then(
         (db:SQLiteObject)=>{
-          db.executeSql('INSERT INTO expense VALUES(NULL,?,?,?,?)',
-          [
-            this.data.date,
-            this.data.type,
-            this.data.description,
-            this.data.amount
-          ])
-          .then(res=>{
-            console.log(res);
-            //แสดง popup (toast)
-              this.toast.show('Data saved', '3000', 'center')
-                .subscribe(toast=>{
-              this.navCtrl.popToRoot();
-            }
-            );
-          })
-          .catch(e =>{
-            console.log(e);
-              this.toast.show('Data saved', '3000', 'center')
-                toast=>{
-                  console.log(toast);
-               }
+          db.executeSql("INSERT INTO expense VALUES (NULL,?,?,?,?)",
+            [
+              this.data.date,
+              this.data.type,
+              this.data.description,
+              this.data.amount
+            ])
+            .then(
+              res=>{
+                console.log(res);
+                //แสดง popup (toast)
+                this.toast.show('Data Saved','3000','center')
+                  .subscribe(toast=>{
+                    this.navCtrl.popToRoot();
+                  });
+              }
+            )
+            .catch(e=>{
+                        console.log(e);
+                        this.toast.show(e,'3000','center')
+                          .subscribe(toast=>{
+                             console.log(toast);
+                          });
             });
-        })
-          .catch(e =>{
-            console.log(e);
-              this.toast.show('Data saved', '3000', 'center')
-                toast=>{
-                  console.log(toast);
-           }
-        });
-    }
-
+        }
+      )
+      .catch(e=>{
+        console.log(e);
+        this.toast.show(e,'3000','center')
+          .subscribe(toast=>{
+             console.log(toast);
+          });
+        this.status="error " + e;
+      });
+  }
 }
